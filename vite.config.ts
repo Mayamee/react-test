@@ -14,6 +14,7 @@ export default defineConfig({
         __dirname,
         "node_modules/bootstrap/scss/bootstrap"
       ),
+			"@components": path.resolve(__dirname, "src/components"),
     },
   },
   server: {
