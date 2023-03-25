@@ -23,4 +23,21 @@ export const basicSchema = Yup.object().shape({
     "Passwords must match"
   ),
 });
+
+export const advancedSchema = Yup.object().shape({
+  username: Yup.string()
+    .min(3, "Username must be at least 3 characters long")
+    .required("Username is required"),
+  jobType: Yup.string()
+    .oneOf(
+      ["designer", "developer", "product", "other"],
+      "Job Type is invalid. Please select Job Type from the list or select"
+    )
+    .required("Job Type is required"),
+  acceptedTos: Yup.boolean().oneOf(
+    [true],
+    "You must accept the terms and conditions"
+  ),
+});
+
 console.log({ YupBasicSchema: basicSchema });

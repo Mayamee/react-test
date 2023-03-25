@@ -1,12 +1,20 @@
 import { useFormikContext } from "formik";
+// import { FormikContext } from "formik";
+// import { useContext } from "react";
 
 const Debug = () => {
   const formik = useFormikContext();
+  // const fomikContext = useContext(FormikContext);
   if (!formik) {
     return null;
   }
   return (
-    <div className="mt-3">
+    <div
+      className="mt-3 mx-auto"
+      style={{
+        width: 600,
+      }}
+    >
       <h3 className="bg-primary text-light px-3 py-2 rounded-top mb-0">
         Formik state:
       </h3>
