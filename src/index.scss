@@ -1,7 +1,10 @@
+@import "@bootstrap";
 * {
   box-sizing: border-box;
 }
 body {
+  padding: 0;
+  margin: 0;
   font-family: "Courier New", Courier, monospace;
   font-size: 1rem;
   color: #000;
