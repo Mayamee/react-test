@@ -6,7 +6,7 @@ interface CarouselItemProps {
   image: string;
   isActive: boolean;
 }
-const data: Omit<CarouselItemProps, >[] = [
+const data: any[] = [
   {
     image,
     isActive: true,
