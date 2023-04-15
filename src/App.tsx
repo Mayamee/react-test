@@ -3,6 +3,7 @@ import { Reservation } from '@components/Miniformik/Miniformik';
 import BasicForm from '@components/FormikHooks/BasicForm';
 import AdvancedForm from '@components/FormikHooks/AdvancedForm';
 import Pagination from '@components/Pagination/Pagination';
+import Chat from '@components/Chat/Chat';
 
 const App = () => {
   return (
@@ -11,7 +12,8 @@ const App = () => {
       {/* <FormikTest /> */}
       {/* <BasicForm /> */}
       {/* <AdvancedForm /> */}
-      <Pagination />
+      {/* <Pagination /> */}
+      <Chat />
     </div>
   );
 };
