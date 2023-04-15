@@ -1,24 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Form, Container, Pagination as BPagination } from 'react-bootstrap';
 import { useImmer } from 'use-immer';
 import AddModal from './AddModal';
 import RenameModal from './RenameModal';
 import RemoveModal from './RemoveModal';
 import ResetModal from './ResetModal';
+import tasksDBCreator from './customData';
 
-const tasksDB = [
-  { id: 0, name: 'Test1' },
-  { id: 1, name: 'Test2' },
-  { id: 2, name: 'Test3' },
-  { id: 3, name: 'Test4' },
-  { id: 4, name: 'Test5' },
-  { id: 5, name: 'Test6' },
-  { id: 6, name: 'Test7' },
-  { id: 7, name: 'Test8' },
-  { id: 8, name: 'Test9' },
-  { id: 9, name: 'Test10' },
-  { id: 10, name: 'Test11' },
-];
+const tasksDB = tasksDBCreator(1000);
 
 const pageFilters = [5, 10, 20, 50, 100];
 
@@ -33,13 +22,44 @@ const Pagination = () => {
   const [tasks, setTasks] = useImmer(tasksDB);
   const totalPages = Math.ceil(tasks.length / tasksPerPage);
 
+  useEffect(() => {
+    const closeModalListener = document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        handleCloseModal();
+      }
+    });
+    const nextPageListener = document.addEventListener('keydown', (e) => {
+      if (e.code === 'ArrowRight') {
+        handleNext();
+      }
+    });
+    const prevPageListener = document.addEventListener('keydown', (e) => {
+      if (e.code === 'ArrowLeft') {
+        handlePrev();
+      }
+    });
+    const checkKeysListener = document.addEventListener('keydown', (e) => {
+      console.log(`key: ${e.key}, code: ${e.code}, keyCode: ${e.keyCode}, which: ${e.which}`);
+    });
+    return () => {
+      document.removeEventListener('keydown', closeModalListener);
+      document.removeEventListener('keydown', nextPageListener);
+      document.removeEventListener('keydown', prevPageListener);
+      document.removeEventListener('keydown', checkKeysListener);
+    };
+  }, []);
+
   const handleNext = () => {
-    if (currentPage > totalPages - 1) return;
-    setCurrentPage((prev) => prev + 1);
+    setCurrentPage((prev) => {
+      if (prev > totalPages - 1) return prev;
+      return prev + 1;
+    });
   };
   const handlePrev = () => {
-    if (currentPage === 1) return;
-    setCurrentPage((prev) => prev - 1);
+    setCurrentPage((prev) => {
+      if (prev < 2) return prev;
+      return prev - 1;
+    });
   };
   const handlePage = (id) => () => {
     setCurrentPage(id);
@@ -165,17 +185,72 @@ const Pagination = () => {
     );
   };
   const renderNav = () => {
+    // TODO: add dynamic rendering of pages
+    const renderDynamicPages = () => {
+      return (
+        <>
+          {currentPage > 5 && (
+            <>
+              <BPagination.Item onClick={handlePage(1)}>1</BPagination.Item>
+              <BPagination.Ellipsis />
+            </>
+          )}
+          {currentPage > 4 && (
+            <BPagination.Item onClick={handlePage(currentPage - 4)}>
+              {currentPage - 4}
+            </BPagination.Item>
+          )}
+          {currentPage > 3 && (
+            <BPagination.Item onClick={handlePage(currentPage - 3)}>
+              {currentPage - 3}
+            </BPagination.Item>
+          )}
+          {currentPage > 2 && (
+            <BPagination.Item onClick={handlePage(currentPage - 2)}>
+              {currentPage - 2}
+            </BPagination.Item>
+          )}
+          {currentPage > 1 && (
+            <BPagination.Item onClick={handlePage(currentPage - 1)}>
+              {currentPage - 1}
+            </BPagination.Item>
+          )}
+          <BPagination.Item active>{currentPage}</BPagination.Item>
+          {currentPage < totalPages && (
+            <BPagination.Item onClick={handlePage(currentPage + 1)}>
+              {currentPage + 1}
+            </BPagination.Item>
+          )}
+          {currentPage < totalPages - 1 && (
+            <BPagination.Item onClick={handlePage(currentPage + 2)}>
+              {currentPage + 2}
+            </BPagination.Item>
+          )}
+          {currentPage < totalPages - 2 && (
+            <BPagination.Item onClick={handlePage(currentPage + 3)}>
+              {currentPage + 3}
+            </BPagination.Item>
+          )}
+          {currentPage < totalPages - 3 && (
+            <BPagination.Item onClick={handlePage(currentPage + 4)}>
+              {currentPage + 4}
+            </BPagination.Item>
+          )}
+
+          {currentPage < totalPages - 4 && (
+            <>
+              <BPagination.Ellipsis />
+              <BPagination.Item onClick={handlePage(totalPages)}>{totalPages}</BPagination.Item>
+            </>
+          )}
+        </>
+      );
+    };
     return (
       <div className="d-flex justify-content-center mt-3">
         <BPagination>
           <BPagination.Prev onClick={handlePrev} />
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((id) => {
-            return (
-              <BPagination.Item key={id} active={id === currentPage} onClick={handlePage(id)}>
-                {id}
-              </BPagination.Item>
-            );
-          })}
+          {renderDynamicPages()}
           <BPagination.Next onClick={handleNext} />
         </BPagination>
       </div>
