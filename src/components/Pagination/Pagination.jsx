@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Form, Container, Pagination as BPagination } from 'react-bootstrap';
 import { useImmer } from 'use-immer';
+
 import AddModal from './AddModal';
 import RenameModal from './RenameModal';
 import RemoveModal from './RemoveModal';
@@ -14,43 +15,48 @@ const pageFilters = [5, 10, 20, 50, 100];
 const Pagination = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [tasksPerPage, setTasksPerPage] = useState(5);
+  const [tasks, setTasks] = useImmer(tasksDB);
+  const totalPages = Math.ceil(tasks.length / tasksPerPage);
+
   const [modalState, setModalState] = useImmer({
     type: 'none',
     show: false,
     id: null,
   });
-  const [tasks, setTasks] = useImmer(tasksDB);
-  const totalPages = Math.ceil(tasks.length / tasksPerPage);
-
   useEffect(() => {
-    const closeModalListener = document.addEventListener('keydown', (e) => {
+    const closeModalListener = (e) => {
       if (e.key === 'Escape') {
         handleCloseModal();
       }
-    });
-    const nextPageListener = document.addEventListener('keydown', (e) => {
+    };
+    const nextPageListener = (e) => {
       if (e.code === 'ArrowRight') {
         handleNext();
       }
-    });
-    const prevPageListener = document.addEventListener('keydown', (e) => {
+    };
+    const prevPageListener = (e) => {
       if (e.code === 'ArrowLeft') {
         handlePrev();
       }
-    });
-    const checkKeysListener = document.addEventListener('keydown', (e) => {
+    };
+    const checkKeysListener = (e) => {
       console.log(`key: ${e.key}, code: ${e.code}, keyCode: ${e.keyCode}, which: ${e.which}`);
-    });
+    };
+
+    document.addEventListener('keydown', closeModalListener);
+    document.addEventListener('keydown', nextPageListener);
+    document.addEventListener('keydown', prevPageListener);
+    document.addEventListener('keydown', checkKeysListener);
     return () => {
       document.removeEventListener('keydown', closeModalListener);
       document.removeEventListener('keydown', nextPageListener);
       document.removeEventListener('keydown', prevPageListener);
       document.removeEventListener('keydown', checkKeysListener);
     };
-  }, []);
-
+  }, [totalPages, tasksPerPage]);
   const handleNext = () => {
     setCurrentPage((prev) => {
+      console.log({ totalPages, tasksPerPage });
       if (prev > totalPages - 1) return prev;
       return prev + 1;
     });
@@ -131,6 +137,7 @@ const Pagination = () => {
     setCurrentPage(1);
     handleCloseModal();
   };
+
   const renderModal = () => {
     switch (modalState.type) {
       case 'add':
