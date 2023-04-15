@@ -1,13 +1,13 @@
-import { Formik, Form, Field } from "formik";
-import { advancedSchema } from "./validation/schema";
-import Debug from "./Debug";
-import CustomInput from "./UI/CustomInput";
-import CustomSelect from "./UI/CustomSelect";
-import CustomCheckBox from "./UI/CustomCheckBox";
+import { Formik, Form, Field } from 'formik';
+import { advancedSchema } from './validation/schema';
+import Debug from './Debug';
+import CustomInput from './UI/CustomInput';
+import CustomSelect from './UI/CustomSelect';
+import CustomCheckBox from './UI/CustomCheckBox';
 
 const initialValues = {
-  username: "",
-  jobType: "",
+  username: '',
+  jobType: '',
   acceptedTos: false,
 };
 
@@ -50,10 +50,7 @@ const AdvancedForm = () => (
               <option value="product">Product Manager</option>
               <option value="other">Other</option>
             </CustomSelect>
-            <CustomCheckBox
-              name="acceptedTos"
-              placeholder="I accept the terms and conditions"
-            />
+            <CustomCheckBox name="acceptedTos" placeholder="I accept the terms and conditions" />
             {/* <Field
               type="email"
               name="email"
@@ -69,12 +66,8 @@ const AdvancedForm = () => (
             />
             {errors.password && touched.password && errors.password} */}
             <div className="d-grid">
-              <button
-                className="btn btn-success"
-                type="submit"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "Submitting..." : "Submit"}
+              <button className="btn btn-success" type="submit" disabled={isSubmitting}>
+                {isSubmitting ? 'Submitting...' : 'Submit'}
               </button>
             </div>
           </Form>

@@ -1,8 +1,8 @@
-import { useId } from "react";
-import { useField } from "formik";
-import clsx from "clsx";
+import { useId } from 'react';
+import { useField } from 'formik';
+import clsx from 'clsx';
 const CustomCheckBox = ({ placeholder, ...props }) => {
-	const id = useId();
+  const id = useId();
   const [field, meta, helpers] = useField(props);
   console.log({
     field,
@@ -12,26 +12,24 @@ const CustomCheckBox = ({ placeholder, ...props }) => {
   return (
     <div className="mb-3">
       <input
-        className={clsx("form-check-input", {
-          "border border-danger": meta.touched && meta.error,
+        className={clsx('form-check-input', {
+          'border border-danger': meta.touched && meta.error,
         })}
-				id={id}
+        id={id}
         type="checkbox"
         {...field}
         {...props}
       />
       <label
         className="d-inline-block ms-3"
-				htmlFor={id}
+        htmlFor={id}
         style={{
-          userSelect: "none",
+          userSelect: 'none',
         }}
       >
         {placeholder}
       </label>
-      {meta.touched && meta.error && (
-        <div className="text-danger">{meta.error}</div>
-      )}
+      {meta.touched && meta.error && <div className="text-danger">{meta.error}</div>}
     </div>
   );
 };

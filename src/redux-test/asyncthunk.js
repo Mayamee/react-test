@@ -1,4 +1,4 @@
-import pkg from "@reduxjs/toolkit";
+import pkg from '@reduxjs/toolkit';
 const {
   createAsyncThunk,
   configureStore,
@@ -7,27 +7,24 @@ const {
   createReducer,
   createAction,
 } = pkg;
-import { nanoid } from "nanoid";
+import { nanoid } from 'nanoid';
 
-const fetchTodos = createAsyncThunk("todos/getAll", async () => {
-  const res = await fetch("https://jsonplaceholder.typicode.com/todos/");
+const fetchTodos = createAsyncThunk('todos/getAll', async () => {
+  const res = await fetch('https://jsonplaceholder.typicode.com/todos/');
   return await res.json();
 });
 
-const fetchTodo = createAsyncThunk(
-  "todos/getTodoById",
-  async (id, { dispatch, getState }) => {
-    const res = await fetch(`https://jsonplaceholder.typicode.com/todos/${id}`);
-    return await res.json();
-  }
-);
+const fetchTodo = createAsyncThunk('todos/getTodoById', async (id, { dispatch, getState }) => {
+  const res = await fetch(`https://jsonplaceholder.typicode.com/todos/${id}`);
+  return await res.json();
+});
 
 const todosAdapter = createEntityAdapter({
   // selectId: (elem) => elem
 });
 
 const todoSlice = createSlice({
-  name: "todos",
+  name: 'todos',
   initialState: todosAdapter.getInitialState({
     fetching: false,
     err: null,
@@ -73,9 +70,9 @@ const initialState = {
 //     createdAt: new Date().toISOString(),
 //   },
 // }));
-const test_inc = createAction("inc");
-const test_dec = createAction("dec");
-const test_add = createAction("add");
+const test_inc = createAction('inc');
+const test_dec = createAction('dec');
+const test_add = createAction('add');
 // const tt_inc = (n) => ({
 //   type: "inc",
 //   payload: n,
@@ -101,7 +98,7 @@ const store = configureStore({
 });
 
 store.subscribe(() => {
-  console.log("Checking state...");
+  console.log('Checking state...');
   console.log(JSON.stringify(store.getState(), null, 2));
 });
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 class MiniFormik extends React.Component {
   state = {
@@ -8,7 +8,7 @@ class MiniFormik extends React.Component {
   };
   handleChange = (event) => {
     const target = event.target;
-    const value = target.type === "checkbox" ? target.checked : target.value;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
     const name = target.name;
     event.persist();
     this.setState((prevState) => ({
@@ -29,16 +29,16 @@ class MiniFormik extends React.Component {
       },
     }));
   };
-	handleSubmit = (event) => {
-		event.preventDefault();
-		this.props.onSubmit(this.state.values);
-	}
+  handleSubmit = (event) => {
+    event.preventDefault();
+    this.props.onSubmit(this.state.values);
+  };
   render() {
     return this.props.children({
       ...this.state,
       handleChange: this.handleChange,
       handleBlur: this.handleBlur,
-			handleSubmit: this.handleSubmit,
+      handleSubmit: this.handleSubmit,
     });
   }
 }
@@ -80,8 +80,10 @@ class Reservation extends React.Component {
                   onBlur={handleBlur}
                 />
               </label>
-							<br />
-							<button type="submit" onSubmit={handleSubmit}>Submit</button>
+              <br />
+              <button type="submit" onSubmit={handleSubmit}>
+                Submit
+              </button>
               <pre>{JSON.stringify(props, null, 2)}</pre>
             </form>
           );

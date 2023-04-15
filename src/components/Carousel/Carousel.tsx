@@ -1,6 +1,6 @@
-import { FC, useState } from "react";
-import cn from "classnames";
-import image from "../../assets/react.svg";
+import { FC, useState } from 'react';
+import cn from 'classnames';
+import image from '../../assets/react.svg';
 interface CarouselProps {}
 interface CarouselItemProps {
   image: string;
@@ -21,7 +21,7 @@ const data: any[] = [
   },
 ];
 const CarouselItem: FC<CarouselItemProps> = ({ isActive = false, image }) => {
-  const classes = cn("carousel-item", {
+  const classes = cn('carousel-item', {
     active: isActive,
   });
   return (

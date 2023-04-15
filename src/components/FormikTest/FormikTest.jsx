@@ -1,19 +1,13 @@
-import {
-  Formik,
-  Field,
-  Form,
-  FieldArray,
-  ErrorMessage as FormikErrorMessage,
-} from "formik";
-import ErrorMessage from "./ErrrorMessage";
-import Debug from "./Debug";
-import { formikSchema } from "./schema/formikschema";
+import { Formik, Field, Form, FieldArray, ErrorMessage as FormikErrorMessage } from 'formik';
+import ErrorMessage from './ErrrorMessage';
+import Debug from './Debug';
+import { formikSchema } from './schema/formikschema';
 
 const initialValues = {
   friends: [
     {
-      name: "",
-      email: "",
+      name: '',
+      email: '',
     },
   ],
 };
@@ -43,9 +37,9 @@ const Invitation = () => {
             <div
               style={{
                 width: 600,
-                margin: "0 auto",
-                backgroundColor: "#eee",
-                padding: "1rem",
+                margin: '0 auto',
+                backgroundColor: '#eee',
+                padding: '1rem',
               }}
             >
               <Form>
@@ -59,19 +53,11 @@ const Invitation = () => {
                             <div className="col">
                               <Field name={`friends[${index}].name`}>
                                 {({ field, form }) => (
-                                  <input
-                                    {...field}
-                                    type="text"
-                                    placeholder="Jane Doe"
-                                  />
+                                  <input {...field} type="text" placeholder="Jane Doe" />
                                 )}
                               </Field>
                               <ErrorMessage name={`friends[${index}].name`}>
-                                {(msg) => (
-                                  <div className="alert alert-danger py-1 my-2">
-                                    {msg}
-                                  </div>
-                                )}
+                                {(msg) => <div className="alert alert-danger py-1 my-2">{msg}</div>}
                               </ErrorMessage>
                             </div>
                             <div className="col">
@@ -81,11 +67,7 @@ const Invitation = () => {
                                 placeholder="janedoe@example.com"
                               />
                               <ErrorMessage name={`friends[${index}].email`}>
-                                {(msg) => (
-                                  <div className="alert alert-danger py-1 my-2">
-                                    {msg}
-                                  </div>
-                                )}
+                                {(msg) => <div className="alert alert-danger py-1 my-2">{msg}</div>}
                               </ErrorMessage>
                             </div>
                             <div className="col">
@@ -104,8 +86,8 @@ const Invitation = () => {
                         <button
                           onClick={() =>
                             push({
-                              name: "",
-                              email: "",
+                              name: '',
+                              email: '',
                             })
                           }
                           className="btn btn-danger t"
@@ -118,12 +100,8 @@ const Invitation = () => {
                   )}
                 </FieldArray>
                 <div className="row px-5 mt-2">
-                  <button
-                    className="btn btn-success"
-                    type="submit"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? "Inviting..." : "Invite"}
+                  <button className="btn btn-success" type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? 'Inviting...' : 'Invite'}
                   </button>
                 </div>
               </Form>

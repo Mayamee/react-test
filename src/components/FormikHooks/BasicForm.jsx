@@ -1,14 +1,14 @@
-import { useRef } from "react";
-import { useFormik } from "formik";
-import { basicSchema } from "./validation/schema";
-import isUndefined from "lodash/isUndefined";
-import clsx from "clsx";
+import { useRef } from 'react';
+import { useFormik } from 'formik';
+import { basicSchema } from './validation/schema';
+import isUndefined from 'lodash/isUndefined';
+import clsx from 'clsx';
 // import Debug from "@components/FormikHooks/Debug";
 const initialValues = {
-  email: "",
-  age: "",
-  password: "",
-  confirmPassword: "",
+  email: '',
+  age: '',
+  password: '',
+  confirmPassword: '',
 };
 const onSubmitHandler = (values, actions) => {
   console.log({
@@ -23,22 +23,15 @@ const onSubmitHandler = (values, actions) => {
 };
 //todo check ctx - we need an object to bind this handler to it
 function FormikHooks() {
-  const {
-    isSubmitting,
-    errors,
-    touched,
-    values,
-    handleBlur,
-    handleChange,
-    handleSubmit,
-  } = useFormik({
-    initialValues,
-    onSubmit: onSubmitHandler,
-    validationSchema: basicSchema,
-  });
+  const { isSubmitting, errors, touched, values, handleBlur, handleChange, handleSubmit } =
+    useFormik({
+      initialValues,
+      onSubmit: onSubmitHandler,
+      validationSchema: basicSchema,
+    });
   const counter = useRef(0);
   counter.current++;
-  console.log("counter.current", counter.current);
+  console.log('counter.current', counter.current);
 
   return (
     <div
@@ -47,7 +40,7 @@ function FormikHooks() {
         width: 600,
       }}
     >
-			<h2 className="mb-3 text-center">Formik test form</h2>
+      <h2 className="mb-3 text-center">Formik test form</h2>
       <form onSubmit={handleSubmit} autoComplete="off" action="#">
         <div className="mb-3">
           <label htmlFor="emailInput1" className="form-label">
@@ -59,9 +52,8 @@ function FormikHooks() {
             onBlur={handleBlur}
             name="email"
             type="email"
-            className={clsx("form-control", {
-              "border border-danger":
-                touched.email && !isUndefined(errors.email),
+            className={clsx('form-control', {
+              'border border-danger': touched.email && !isUndefined(errors.email),
             })}
             id="emailInput1"
             title="Please enter a valid email address"
@@ -84,8 +76,8 @@ function FormikHooks() {
             onBlur={handleBlur}
             name="age"
             type="number"
-            className={clsx("form-control", {
-              "border border-danger": touched.age && !isUndefined(errors.age),
+            className={clsx('form-control', {
+              'border border-danger': touched.age && !isUndefined(errors.age),
             })}
             id="exampleAge1"
             title="Age should be between 0 and 120"
@@ -108,9 +100,8 @@ function FormikHooks() {
             onBlur={handleBlur}
             name="password"
             type="password"
-            className={clsx("form-control", {
-              "border border-danger":
-                touched.password && !isUndefined(errors.password),
+            className={clsx('form-control', {
+              'border border-danger': touched.password && !isUndefined(errors.password),
             })}
             id="examplePassword1"
             title="Password should be at least 8 characters long"
@@ -133,8 +124,8 @@ function FormikHooks() {
             onBlur={handleBlur}
             name="confirmPassword"
             type="password"
-            className={clsx("form-control", {
-              "border border-danger":
+            className={clsx('form-control', {
+              'border border-danger':
                 touched.confirmPassword && !isUndefined(errors.confirmPassword),
             })}
             id="exampleConfirmPassword1"
@@ -149,12 +140,8 @@ function FormikHooks() {
           )}
         </div>
         <div className="d-grid">
-          <button
-            type="submit"
-            className="btn btn-primary"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Submitting..." : "Submit"}
+          <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+            {isSubmitting ? 'Submitting...' : 'Submit'}
           </button>
         </div>
       </form>

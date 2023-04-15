@@ -1,0 +1,9 @@
+node_modules
+*.log
+*.env
+*.yml
+*.pnp*
+.vscode
+.yarn/
+dist/
+build/
