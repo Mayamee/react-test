@@ -1,4 +1,4 @@
-import { createSlice, createEntityAdapter } from '@reduxjs/toolkit';
+import { createSlice, createEntityAdapter, createSelector } from '@reduxjs/toolkit';
 
 const messagesAdapter = createEntityAdapter();
 const roomsAdapter = createEntityAdapter();
@@ -10,7 +10,7 @@ const chatSlice = createSlice({
     rooms: roomsAdapter.getInitialState(),
     userId: null,
     userName: 'anonymous',
-    currentRoom: 'global',
+    currentRoomId: 0,
     status: 'disconnected',
   },
   reducers: {
@@ -29,8 +29,8 @@ const chatSlice = createSlice({
     setUserName: (state, { payload: userName }) => {
       state.userName = userName;
     },
-    setCurrentRoom: (state, { payload: room }) => {
-      state.currentRoom = room;
+    setCurrentRoomId: (state, { payload: roomId }) => {
+      state.currentRoomId = roomId;
     },
     setStatus: (state, { payload: status }) => {
       state.status = status;
@@ -45,13 +45,22 @@ export const { selectAll: selectAllMessages } = messagesAdapter.getSelectors(
   (state) => state.chat.messages
 );
 
+export const selectMessagesByCurrentRoom = createSelector(
+  [(state) => selectAllMessages(state), (state) => state.chat.currentRoomId],
+  (messages, currentRoomId) => messages.filter((message) => message.room === currentRoomId)
+);
 export const { selectAll: selectAllRooms } = roomsAdapter.getSelectors((state) => state.chat.rooms);
+
+export const selectCurrentRoomName = createSelector(
+  [selectAllRooms, (state) => state.chat.currentRoomId],
+  (rooms, currentRoomId) => rooms.find((room) => room.id === currentRoomId)?.name
+);
 
 export const {
   addMessage,
   removeMessage,
   cleanMessages,
-  setCurrentRoom,
+  setCurrentRoomId,
   setUserId,
   setUserName,
   setStatus,

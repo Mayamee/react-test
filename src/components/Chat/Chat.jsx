@@ -3,19 +3,19 @@ import { useState, useEffect } from 'react';
 import { Button, Container, Form, FormGroup, Stack } from 'react-bootstrap';
 import { useFormik } from 'formik';
 import {
-  selectAllMessages,
+  selectCurrentRoomName,
+  selectMessagesByCurrentRoom,
   selectAllRooms,
   addMessage,
   removeMessage,
-  cleanMessages,
-  setCurrentRoom,
+  setCurrentRoomId,
   setUserId,
   setUserName,
   setStatus,
   setRooms,
 } from './redux/slices/chatSlice';
 import cx from 'clsx';
-import { useSocket, useSocketContext } from './hooks/useSocket';
+import { useSocket } from './hooks/useSocket';
 
 const roomsDB = [
   {
@@ -33,19 +33,23 @@ const roomsDB = [
 ];
 
 const Chat = () => {
-  const messages = useSelector(selectAllMessages);
+  const currentRoomName = useSelector(selectCurrentRoomName);
+  const currentRoomId = useSelector((state) => state.chat.currentRoomId);
+  const roomMessages = useSelector(selectMessagesByCurrentRoom);
+  const rooms = useSelector(selectAllRooms);
   const status = useSelector((state) => state.chat.status);
   const userId = useSelector((state) => state.chat.userId);
   const userName = useSelector((state) => state.chat.userName);
-  const currentRoom = useSelector((state) => state.chat.currentRoom);
   const socket = useSocket('http://localhost:8090');
-  const rooms = useSelector(selectAllRooms);
   const dispatch = useDispatch();
   const [isUserNameEditable, setIsUserNameEditable] = useState(false);
-
+  console.log({
+    currentRoomName,
+  });
   useEffect(() => {
     if (!socket) return;
     dispatch(setRooms(roomsDB));
+    dispatch(setCurrentRoomId(roomsDB[0].id));
     socket.on('connect', () => {
       dispatch(setStatus('connected'));
       dispatch(setUserId(socket.id));
@@ -82,9 +86,10 @@ const Chat = () => {
       const messageObj = {
         id: Date.now().toLocaleString(),
         message,
-        room: currentRoom,
+        room: currentRoomId,
         date: Date.now(),
         from: userName,
+        ownerId: userId,
       };
       socket.emit('sendMessage', messageObj);
       dispatch(addMessage(messageObj));
@@ -97,7 +102,7 @@ const Chat = () => {
       <Container>
         <div className="d-flex flex-column">
           <div className="text-center my-3" id="chat-heading">
-            <h1>Simple ws chat</h1>
+            <h1>Websocket chat</h1>
           </div>
           <div id="chat-body">
             <div id="chat-input">
@@ -121,8 +126,9 @@ const Chat = () => {
                     <Button
                       className="ms-2"
                       onClick={() => {
-                        setIsUserNameEditable((editable) => !editable);
                         const username = f.values.username;
+                        if (username.length === 0) return;
+                        setIsUserNameEditable(!isUserNameEditable);
                         if (isUserNameEditable && username.length > 0) {
                           dispatch(setUserName(username));
                         }
@@ -159,8 +165,8 @@ const Chat = () => {
               }}
             >
               <Stack id="chat-box">
-                {messages.length === 0 && <div className="text-muted">Нет сообщений</div>}
-                {messages.map((message) => {
+                {roomMessages.length === 0 && <div className="text-muted">Нет сообщений</div>}
+                {roomMessages.map((message) => {
                   return (
                     <div
                       key={message.id}
@@ -179,7 +185,7 @@ const Chat = () => {
                         </div>
                         <div>{message.message}</div>
                       </div>
-                      {userName === message.from && (
+                      {userId === message.ownerId && (
                         <div className="btn-block">
                           <Button
                             onClick={handleRemoveMessage(message.id)}
@@ -206,14 +212,14 @@ const Chat = () => {
                 <Form.Select
                   disabled={status === 'disconnected'}
                   aria-label="Select room"
-                  value={currentRoom}
+                  value={currentRoomId}
                   onChange={(e) => {
-                    socket.emit('joinRoom', e.target.value);
-                    dispatch(setCurrentRoom(e.target.value));
+                    socket.emit('joinRoom', +e.target.value);
+                    dispatch(setCurrentRoomId(+e.target.value));
                   }}
                 >
                   {rooms.map((room) => (
-                    <option key={room.id} value={room.name}>
+                    <option key={room.id} value={room.id}>
                       {room.name}
                     </option>
                   ))}
@@ -240,7 +246,8 @@ const Chat = () => {
         {status === 'connected' ? (
           <>
             <p className="my-0">{status}</p>
-            <p className="my-0">room: {currentRoom}</p>
+            <p className="my-0">room: {currentRoomName}</p>
+            <p className="my-0">user: {userName}</p>
           </>
         ) : (
           <p className="my-0">{status}</p>

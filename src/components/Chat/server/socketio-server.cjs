@@ -9,8 +9,8 @@ io.on('connection', (socket) => {
   socket.on('sendMessage', (message) => {
     // console.log({ data, id });
     // io.emit('receiveMessage', message); // send to all
-    // socket.broadcast.emit('receiveMessage', message); // send to all except sender
-    socket.to(message.room).emit('receiveMessage', message); // send to all in room
+    socket.broadcast.emit('receiveMessage', message); // send to all except sender
+    // socket.to(message.room).emit('receiveMessage', message); // send to all in room
   });
   socket.on('removeMessage', (id) => {
     socket.broadcast.emit('removeMessage', id);
