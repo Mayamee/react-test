@@ -5,7 +5,7 @@ const io = require('socket.io')(8090, {
 });
 
 io.on('connection', (socket) => {
-  console.log(socket.id);
+  console.log('New user connected with id: ' + socket.id);
   socket.on('sendMessage', (message) => {
     // console.log({ data, id });
     // io.emit('receiveMessage', message); // send to all

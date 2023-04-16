@@ -8,7 +8,8 @@ const chatSlice = createSlice({
   initialState: {
     messages: messagesAdapter.getInitialState(),
     rooms: roomsAdapter.getInitialState(),
-    user: null,
+    userId: null,
+    userName: 'anonymous',
     currentRoom: 'global',
     status: 'disconnected',
   },
@@ -22,8 +23,11 @@ const chatSlice = createSlice({
     cleanMessages: (state) => {
       messagesAdapter.removeAll(state.messages);
     },
-    setUser: (state, { payload: user }) => {
-      state.user = user;
+    setUserId: (state, { payload: userId }) => {
+      state.userId = userId;
+    },
+    setUserName: (state, { payload: userName }) => {
+      state.userName = userName;
     },
     setCurrentRoom: (state, { payload: room }) => {
       state.currentRoom = room;
@@ -48,7 +52,8 @@ export const {
   removeMessage,
   cleanMessages,
   setCurrentRoom,
-  setUser,
+  setUserId,
+  setUserName,
   setStatus,
   setRooms,
 } = chatSlice.actions;

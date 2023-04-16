@@ -9,12 +9,13 @@ import {
   removeMessage,
   cleanMessages,
   setCurrentRoom,
-  setUser,
+  setUserId,
+  setUserName,
   setStatus,
   setRooms,
 } from './redux/slices/chatSlice';
-import { io } from 'socket.io-client';
 import cx from 'clsx';
+import { useSocket, useSocketContext } from './hooks/useSocket';
 
 const roomsDB = [
   {
@@ -35,40 +36,19 @@ const Chat = () => {
   const messages = useSelector(selectAllMessages);
   const status = useSelector((state) => state.chat.status);
   const userId = useSelector((state) => state.chat.userId);
+  const userName = useSelector((state) => state.chat.userName);
   const currentRoom = useSelector((state) => state.chat.currentRoom);
-  // const rooms = useSelector(selectAllRooms);
-  const rooms = roomsDB.map((room) => room.name);
-  const [socket, setSocket] = useState(null);
+  const socket = useSocket('http://localhost:8090');
+  const rooms = useSelector(selectAllRooms);
   const dispatch = useDispatch();
-  const f = useFormik({
-    initialValues: {
-      message: '',
-    },
-    validate: (values) => {
-      const errors = {};
-      if (values.message.length === 0) {
-        errors.message = 'required';
-      }
-      return errors;
-    },
-    onSubmit: ({ message }, { resetForm }) => {
-      const messageObj = {
-        id: Date.now().toLocaleString(),
-        message,
-        room: currentRoom,
-        date: Date.now(),
-      };
-      socket.emit('sendMessage', messageObj);
-      dispatch(addMessage(messageObj));
-      resetForm();
-    },
-  });
+  const [isUserNameEditable, setIsUserNameEditable] = useState(false);
+
   useEffect(() => {
+    if (!socket) return;
     dispatch(setRooms(roomsDB));
-    const socket = io('http://localhost:8090');
     socket.on('connect', () => {
       dispatch(setStatus('connected'));
-      dispatch(setUser(socket.id));
+      dispatch(setUserId(socket.id));
     });
     socket.on('receiveMessage', (message) => {
       dispatch(addMessage(message));
@@ -78,18 +58,40 @@ const Chat = () => {
     });
     socket.on('disconnect', () => {
       dispatch(setStatus('disconnected'));
-      dispatch(setUser(null));
+      dispatch(setUserId(null));
     });
-    setSocket(socket);
     socket.emit('joinRoom', 'global');
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
+  }, [socket]);
   const handleRemoveMessage = (id) => () => {
     socket.emit('removeMessage', id);
     dispatch(removeMessage(id));
   };
+  const f = useFormik({
+    initialValues: {
+      message: '',
+      username: userName,
+    },
+    validate: (values) => {
+      const errors = {};
+      if (values.message.length === 0) {
+        errors.message = 'required';
+      }
+      return errors;
+    },
+    onSubmit: ({ message }, helpers) => {
+      const messageObj = {
+        id: Date.now().toLocaleString(),
+        message,
+        room: currentRoom,
+        date: Date.now(),
+        from: userName,
+      };
+      socket.emit('sendMessage', messageObj);
+      dispatch(addMessage(messageObj));
+      helpers.setFieldValue('message', '');
+      helpers.setFieldValue('username', userName);
+    },
+  });
   return (
     <>
       <Container>
@@ -99,44 +101,51 @@ const Chat = () => {
           </div>
           <div id="chat-body">
             <div id="chat-input">
-              <Form
-                onSubmit={f.handleSubmit}
-                noValidate
-                className="mx-auto d-flex flex-column gap-3"
-                style={{
-                  maxWidth: '600px',
-                  minWidth: '200px',
-                }}
-              >
-                <FormGroup>
-                  <Form.Label>Выберите комнату</Form.Label>
-                  <Form.Select
-                    aria-label="Default select example"
-                    onChange={(e) => {
-                      socket.emit('joinRoom', e.target.value);
-                      dispatch(setCurrentRoom(e.target.value));
-                    }}
-                  >
-                    {rooms.map((room) => (
-                      <option key={room} value={room}>
-                        {room}
-                      </option>
-                    ))}
-                  </Form.Select>
-                </FormGroup>
-                <FormGroup className="d-flex">
-                  <Form.Control
-                    disabled={status === 'disconnected'}
-                    value={f.values.message}
-                    onChange={f.handleChange}
-                    type="text"
-                    name="message"
-                    placeholder="Enter message"
-                  />
-                  <Button type="submit" className="ms-2" disabled={status === 'disconnected'}>
-                    Отправить
-                  </Button>
-                </FormGroup>
+              <Form onSubmit={f.handleSubmit} noValidate>
+                <div
+                  className="mx-auto d-flex flex-column gap-3"
+                  style={{
+                    maxWidth: '600px',
+                    minWidth: '200px',
+                  }}
+                >
+                  <FormGroup className="d-flex">
+                    <Form.Control
+                      value={f.values.username}
+                      onChange={f.handleChange}
+                      disabled={!isUserNameEditable}
+                      type="text"
+                      name="username"
+                      placeholder="Введите имя"
+                    />
+                    <Button
+                      className="ms-2"
+                      onClick={() => {
+                        setIsUserNameEditable((editable) => !editable);
+                        const username = f.values.username;
+                        if (isUserNameEditable && username.length > 0) {
+                          dispatch(setUserName(username));
+                        }
+                      }}
+                    >
+                      {isUserNameEditable ? 'Установить' : 'Изменить'}
+                    </Button>
+                  </FormGroup>
+                  <fieldset disabled={status === 'disconnected'}>
+                    <FormGroup className="d-flex">
+                      <Form.Control
+                        value={f.values.message}
+                        onChange={f.handleChange}
+                        type="text"
+                        name="message"
+                        placeholder="Enter message"
+                      />
+                      <Button type="submit" className="ms-2">
+                        Отправить
+                      </Button>
+                    </FormGroup>
+                  </fieldset>
+                </div>
               </Form>
             </div>
             <div
@@ -160,7 +169,7 @@ const Chat = () => {
                       <div>
                         <div className="d-flex">
                           <div className="me-2">
-                            <span className="fw-bold">User</span>
+                            <span className="fw-bold">{message.from}</span>
                           </div>
                           <div>
                             <span className="text-muted">
@@ -170,19 +179,46 @@ const Chat = () => {
                         </div>
                         <div>{message.message}</div>
                       </div>
-                      <div className="btn-block">
-                        <Button
-                          onClick={handleRemoveMessage(message.id)}
-                          variant="danger"
-                          size="sm"
-                        >
-                          Remove
-                        </Button>
-                      </div>
+                      {userName === message.from && (
+                        <div className="btn-block">
+                          <Button
+                            onClick={handleRemoveMessage(message.id)}
+                            variant="danger"
+                            size="sm"
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
               </Stack>
+            </div>
+            <div
+              className="mx-auto mt-3"
+              style={{
+                maxWidth: '600px',
+                minWidth: '200px',
+              }}
+            >
+              <FormGroup>
+                <Form.Select
+                  disabled={status === 'disconnected'}
+                  aria-label="Select room"
+                  value={currentRoom}
+                  onChange={(e) => {
+                    socket.emit('joinRoom', e.target.value);
+                    dispatch(setCurrentRoom(e.target.value));
+                  }}
+                >
+                  {rooms.map((room) => (
+                    <option key={room.id} value={room.name}>
+                      {room.name}
+                    </option>
+                  ))}
+                </Form.Select>
+              </FormGroup>
             </div>
           </div>
         </div>
