@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button, Container, Form, FormGroup, Stack } from 'react-bootstrap';
 import { useFormik } from 'formik';
 import {
@@ -43,9 +43,11 @@ const Chat = () => {
   const socket = useSocket('http://localhost:8090');
   const dispatch = useDispatch();
   const [isUserNameEditable, setIsUserNameEditable] = useState(false);
-  console.log({
-    currentRoomName,
-  });
+  const scrolledBlockRef = useRef(null);
+  useEffect(() => {
+    if (!scrolledBlockRef.current) return;
+    scrolledBlockRef.current.scrollTop = scrolledBlockRef.current.scrollHeight;
+  }, [roomMessages.length, roomMessages]);
   useEffect(() => {
     if (!socket) return;
     dispatch(setRooms(roomsDB));
@@ -144,7 +146,7 @@ const Chat = () => {
                         onChange={f.handleChange}
                         type="text"
                         name="message"
-                        placeholder="Enter message"
+                        placeholder="Введите сообщение"
                       />
                       <Button type="submit" className="ms-2">
                         Отправить
@@ -157,6 +159,7 @@ const Chat = () => {
             <div
               id="chat-messages"
               className="mx-auto mt-3 shadow-sm p-3 rounded"
+              ref={scrolledBlockRef}
               style={{
                 maxWidth: '600px',
                 minWidth: '200px',
